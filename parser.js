@@ -22,11 +22,8 @@ if (!fs.existsSync(processed)) {
 
 export function parsXlsx(filePath){
 
-
-    try {
+    try {   
     
-    
-
         // Чтение файла
         const workbook = XLSX.readFile(filePath);
         const sheetName = workbook.SheetNames[0];
@@ -36,9 +33,7 @@ export function parsXlsx(filePath){
         const rows = XLSX.utils.sheet_to_json(worksheet, {
             header: 1,
             defval: ''
-        });
-
-   
+        });   
 
         const questionsData = [];
 
@@ -77,16 +72,12 @@ export function parsXlsx(filePath){
 
         fs.writeFileSync(jsFilePath, jsContent, 'utf-8');
 
-
         return jsFileName; 
-
-
-
 
     } catch (error) {
 
         console.error('Ошибка обработки файла:', error);
-    // res.status(500).send('Ошибка при обработке файла.');
+        // res.status(500).send('Ошибка при обработке файла.');
 
     } finally {
         // Удаление исходного файла после обработки
