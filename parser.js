@@ -51,21 +51,47 @@ export function parsXlsx(filePath){
         for (let i = 1; i <= 4; i++) {
             const answer = row[i]?.toString().trim();
             if (answer) {
-                answers.push(answer);
+                let id = i - 1;
+                let success = id === 0 ? true : false; 
+                let item = {id: id, success : success, text : answer}
+                answers.push(item);
             }
         }
 
-        questionsData.push({
-            question: question,
-            answers: answers,
-            rowNumber: rowIndex + 1 // Номер строки для отладки
+
+
+        questionsData.push(
+           
+            {
+                question: question,
+                answers: answers,
+            
             });
         });
 
 
+        // stg : {
+        // testTitle : "СТГ",
+        // testBody : [ 
+        //     {question: "Как обозначается разрешенное давление на манометре?", answers: [
+
+        const test  = {
+
+            [sheetName]: {
+
+                testTitle : sheetName,
+                testBody : questionsData
+
+            }
+
+
+
+        }
+
+
 
         // Сохранение в .js файл
-        const jsContent = `// Вопросы и ответы из Excel-файла\nconst questions = ${JSON.stringify(questionsData, null, 2)};\nmodule.exports = questions;\n`;
+        const jsContent = `const test = ${JSON.stringify(test, null, 2)}`;
 
         const jsFileName = `questions_${Date.now()}.js`;
         const jsFilePath = path.join(processed, jsFileName);
@@ -82,7 +108,7 @@ export function parsXlsx(filePath){
     } finally {
         // Удаление исходного файла после обработки
         fs.unlink(filePath, (err) => {
-        if (err) console.error('Не удалось удалить временный файл:', err);
+            if (err) console.error('Не удалось удалить временный файл:', err);
         });
     }
 
