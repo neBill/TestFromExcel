@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -14,4 +14,39 @@
     <a href="/" class="btn">Вернуться на главную</a>
   </div>
 </body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Файл готов к скачиванию</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    .btn {
+      display: inline-block; padding: 10px 20px;
+      background: #007bff; color: white; text-decoration: none;
+      border-radius: 5px; margin: 10px;
+    }
+    .btn:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>Файл готов к скачиванию!</h1>
+  <p>Нажмите кнопку ниже, чтобы скачать файл:</p>
+
+  <!-- Прямая ссылка на скачивание -->
+  <a href="/download/<%= fileName %>" class="btn">Скачать <%= fileName %></a>
+
+  <br>
+  <!-- Кнопка для завершения процесса (удаление + перенаправление) -->
+  <a href="/download-complete/<%= fileName %>" class="btn" style="background: #28a745;">
+    Завершить и вернуться на главную
+  </a>
+
+  <br>
+  <a href="/files" class="btn" style="background: #6c757d;">
+    К списку файлов
+  </a>
+</body>
 </html>
+

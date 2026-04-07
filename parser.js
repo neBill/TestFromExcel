@@ -58,34 +58,20 @@ export function parsXlsx(filePath){
             }
         }
 
-
-
-        questionsData.push(
-           
-            {
-                question: question,
+        questionsData.push(     
+            {  
+                 question: question,
                 answers: answers,
             
             });
         });
 
 
-        // stg : {
-        // testTitle : "СТГ",
-        // testBody : [ 
-        //     {question: "Как обозначается разрешенное давление на манометре?", answers: [
-
         const test  = {
-
             [sheetName]: {
-
                 testTitle : sheetName,
                 testBody : questionsData
-
             }
-
-
-
         }
 
 
@@ -93,7 +79,7 @@ export function parsXlsx(filePath){
         // Сохранение в .js файл
         const jsContent = `const test = ${JSON.stringify(test, null, 2)}`;
 
-        const jsFileName = `questions_${Date.now()}.js`;
+        const jsFileName = `${sheetName}.js`;
         const jsFilePath = path.join(processed, jsFileName);
 
         fs.writeFileSync(jsFilePath, jsContent, 'utf-8');
@@ -102,8 +88,7 @@ export function parsXlsx(filePath){
 
     } catch (error) {
 
-        console.error('Ошибка обработки файла:', error);
-        // res.status(500).send('Ошибка при обработке файла.');
+        console.error('Ошибка обработки файла:', error);        
 
     } finally {
         // Удаление исходного файла после обработки

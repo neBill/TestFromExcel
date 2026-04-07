@@ -5,6 +5,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { parsXlsx } from './parser.js';
+import { parsXlsxMax } from './multiparser.js';
 import { fileURLToPath } from 'url';
 
 const app = express();
@@ -47,27 +48,105 @@ app.post('/upload', upload.single('excelFile'), (req, res) => {
   if (!req.file) {
     return res.status(400).send('Файл не был загружен.');  }
 
-  const jsFileName = parsXlsx(req.file.path)
+  //const jsFileName = parsXlsx(req.file.path)
 
-  res.render('download', { fileName: jsFileName });
+ // const result = parsXlsxMax(req.file.path)
 
-  console.log("success");
+  parsXlsxMax(req.file.path)
+
+
+
+ // res.render('download', { fileName: jsFileName });
+
+  //console.log(result);
 
   
 });
 
 // Скачивание обработанного файла
+// app.get('/download/:fileName', (req, res) => {
+//   const fileName = req.params.fileName;
+//   const filePath = path.join(process.cwd(), 'processed', fileName);
+
+//   res.download(filePath, (err) => {
+//     if (err) {
+//       console.error('Ошибка скачивания файла:', err);
+//       res.status(404).send('Файл не найден.');
+//     }
+//   });
+// });
+
 app.get('/download/:fileName', (req, res) => {
   const fileName = req.params.fileName;
-  const filePath = path.join(process.cwd(), 'processed', fileName);
+  const filePath = path.join(processed, fileName);
 
-  res.download(filePath, (err) => {
+  console.log('Попытка скачать файл:', filePath);
+
+  // Валидация имени файла
+  const cleanFileName = path.basename(fileName);
+  if (fileName !== cleanFileName) {
+    return res.status(400).send('Недопустимое имя файла.');
+  }
+
+  // Проверка существования файла
+  fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
-      console.error('Ошибка скачивания файла:', err);
-      res.status(404).send('Файл не найден.');
+      console.error('Файл не найден:', filePath);
+      return res.status(404).send('Файл не найден.');
     }
+
+    // Проверка, что это файл, а не папка
+    fs.stat(filePath, (statErr, stats) => {
+      if (statErr) {
+        console.error('Ошибка получения информации о файле:', statErr);
+        return res.status(500).send('Ошибка доступа к файлу.');
+      }
+      if (!stats.isFile()) {
+        console.error('Указанный путь — не файл:', filePath);
+        return res.status(400).send('Указанный ресурс не является файлом.');
+      }
+
+      // Установка заголовков
+      res.setHeader('Content-Type', 'application/javascript');
+      res.setHeader('Content-Disposition', `attachment; filename="${cleanFileName}"`);
+
+      // Скачивание файла — это завершает ответ
+      res.download(filePath, (downloadErr) => {
+        if (downloadErr) {
+          console.error('Ошибка скачивания файла:', downloadErr);
+          if (!res.headersSent) {
+            res.status(500).send('Ошибка при скачивании файла.');
+          }
+        } else {
+          console.log('Файл успешно скачан:', cleanFileName);
+          // НЕ делаем ничего с res здесь — ответ уже отправлен!
+        }
+      });
+    });
   });
 });
+
+app.get('/download-complete/:fileName', (req, res) => {
+  const fileName = req.params.fileName;
+  const filePath = path.join(processed, fileName);
+
+  console.log('Попытка удалить файл после скачивания:', filePath);
+
+  // Удаление файла
+  fs.unlink(filePath, (deleteErr) => {
+    if (deleteErr) {
+      console.error('Не удалось удалить файл:', deleteErr);
+      // Продолжаем перенаправление даже если удаление не удалось
+    } else {
+      console.log('Файл удалён после скачивания:', fileName);
+    }
+
+    // Перенаправление на главную — новый ответ
+    res.redirect('/');
+  });
+});
+
+
 
 app.get('/files', async (req, res) => {
   try {
