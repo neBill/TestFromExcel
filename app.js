@@ -5,7 +5,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { parsXlsx } from './parser.js';
-import { parsXlsxMax } from './multiparser.js';
+import { getDataFromExcel } from './multiparser.js';
 import { fileURLToPath } from 'url';
 
 const app = express();
@@ -50,15 +50,15 @@ app.post('/upload', upload.single('excelFile'), (req, res) => {
 
   //const jsFileName = parsXlsx(req.file.path)
 
- // const result = parsXlsxMax(req.file.path)
+  const jsFileName = getDataFromExcel(req.file.path)
 
-  parsXlsxMax(req.file.path)
+  //const result = getDataFromExcel(req.file.path)
 
 
 
- // res.render('download', { fileName: jsFileName });
+  res.render('download', { fileName: jsFileName });
 
-  //console.log(result);
+ // console.log(result);
 
   
 });
